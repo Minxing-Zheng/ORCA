@@ -1,0 +1,15 @@
+# Core dependencies. Versions are the ones this release was developed and
+# tested against; the lower bounds are what the code actually needs.
+numpy>=1.24,<2.0
+pandas>=2.0
+scipy>=1.10
+scikit-learn>=1.3
+torch>=2.0
+matplotlib>=3.7
+ortools>=9.7
+
+# Optional -- only for models.QuantileForest
+# quantile-forest>=1.3
+
+# Optional -- to run the example notebook
+# jupyter>=1.0

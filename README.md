@@ -1,63 +1,65 @@
-# PCP-VCR: Probabilistic Conformal Prediction with Vectorized Non-Conformity Scores
+<div align="center">
 
-This repository contains the implementation for the [paper](https://arxiv.org/pdf/2410.13735) **"Optimizing Conformal Prediction with Vectorized Non-Conformity Scores"**. The repository contains the following key components:
+# Generative Conformal Prediction with Optimized Coverage Allocation
 
-- **`tutorial.ipynb`**: A step-by-step tutorial demonstrating the implementation of PCP-VCR.
-- **`functions.py`**: The main module with core functionalities.
-- **`main.py`**: A parallel implementation of PCP-VCR on synthetic S-shape data.
+**Minxing Zheng** · **Shixiang Zhu**
+<br>
+Carnegie Mellon University
 
-To run the parallel implementation, execute the following command:
+[![NeurIPS 2026](https://img.shields.io/badge/NeurIPS-2026-102137?style=flat-square)](https://neurips.cc/virtual/2026/poster/149988)
+[![arXiv](https://img.shields.io/badge/arXiv-2410.13735-b31b1b?style=flat-square)](https://arxiv.org/abs/2410.13735)
+[![Interactive demo](https://img.shields.io/badge/Interactive_demo-live-007d70?style=flat-square)](https://minxing-zheng.github.io/orca/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-6b7280?style=flat-square)](LICENSE)
 
-````bash
-python main.py --n_sample 10 --n_exp 10 --n 5000
-````
+<a href="https://minxing-zheng.github.io/orca/">
+  <img src="assets/demo-preview.png" alt="Interactive demo comparing Standard CP, PCP and ORCA on the same generated samples" width="100%">
+</a>
 
-An example of the expected output when running `main.py` with specified parameters:
+<sub>Standard CP, PCP and ORCA on the same generated samples. <a href="https://minxing-zheng.github.io/orca/">Try the interactive demo</a>.</sub>
 
+</div>
+
+## Overview
+
+In this paper, we propose **ORCA** (Optimized Ranking and Coverage Allocation), a method that turns samples from a generative model into prediction sets with guaranteed coverage. Instead of one radius for every sample, ORCA learns a separate radius for each density rank, which gives compact, disconnected sets that follow the shape of the distribution.
+
+1. **Explore.** Draw samples from the generative model and rank them by local density, densest first.
+2. **Optimize.** On an exploration split, learn one radius per rank: the smallest balls that still cover the target share of outcomes.
+3. **Calibrate.** On a separate calibration split, scale every radius by one common factor, which gives finite-sample marginal coverage.
+
+## Real data: NYC bike trips
+
+<img src="assets/bike-comparison.jpg" alt="Prediction sets for a bike trip destination from ORCA, PCP, CHR and R2CCP" width="100%">
+
+Prediction sets for the destination of one bike trip (red marker). ORCA and PCP return unions of balls around likely destinations, while CHR and R2CCP return a single rectangle. ORCA shrinks the balls around isolated samples, which gives tighter sets at the same coverage. Map data © OpenStreetMap contributors.
+
+## Getting started
+
+```bash
+git clone https://github.com/Minxing-Zheng/ORCA.git
+cd ORCA
+pip install -e ".[notebook]"
+jupyter notebook notebooks/orca_toy.ipynb
 ```
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:21<00:00,  2.20s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:23<00:00,  2.39s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:21<00:00,  2.11s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:22<00:00,  2.26s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:24<00:00,  2.50s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:20<00:00,  2.01s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:19<00:00,  1.96s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:21<00:00,  2.13s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:22<00:00,  2.29s/it]
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:22<00:00,  2.26s/it]
-PCP-VCR empirical coverage: 0.892
-PCP-VCR empirical exact efficiency: 0.522 
 
-PCP empirical coverage: 0.900
-PCP empirical exact efficiency: 0.556
-```
+The [toy notebook](notebooks/orca_toy.ipynb) runs ORCA end to end on synthetic S-shape data: it fits a generative model, ranks the generated samples, optimizes the radii, calibrates them, and compares the resulting sets with PCP at a 90% coverage target. On 1,000 test points it gives:
 
-## 📖 Overview
+| Method | Coverage | Set size |
+| :--- | :---: | :---: |
+| ORCA | 0.916 | **0.430** |
+| PCP | 0.896 | 0.510 |
 
-Generative models have shown significant promise in critical domains such as medical diagnosis, autonomous driving, and climate science, where reliable decision-making hinges on accurate uncertainty quantification. While probabilistic conformal prediction (PCP) offers a powerful framework for this purpose, its coverage efficiency -- the size of the uncertainty set -- is limited when dealing with complex underlying distributions and a finite number of generated samples. In this paper, we propose a novel PCP framework that enhances efficiency by first vectorizing the non-conformity scores with ranked samples and then optimizing the shape of the prediction set by varying the quantiles for samples at the same rank. Our method delivers valid coverage while producing discontinuous and more efficient prediction sets, making it particularly suited for high-stakes applications. We demonstrate the effectiveness of our approach through experiments on both synthetic and real-world datasets.
+Set size is the average length of the prediction set, so smaller is better.
 
-![method-illustration](method-illustration.png)
+## Citation
 
-### **Key Contributions**:
-
-- **PCP-VCR:** We present a novel method that utilizes vectorized non-conformity scores with ranked samples to enhance the efficiency of probabilistic conformal prediction.
-- **Optimized Quantile Adjustment:** We develop an optimization framework that individually adjusts quantile levels for each rank, leading to tighter and more informative uncertainty sets.
-- **Efficient Computation:** We propose an efficient heuristic algorithm to approximate the optimal quantile vector, making the method computationally practical for large datasets.
-- **Theoretical and Empirical Validation:** We demonstrate through theoretical analysis and empirical evaluations that PCP-VCR maintains valid coverage while significantly improving prediction set efficiency compared to baseline methods.
-
-![real_data_comparison](real_data_comparison.png)
-
-## 🔍 References
-
-```
-@misc{pcp_vcr:2024,
-      title={Optimizing Probabilistic Conformal Prediction with Vectorized Non-Conformity Scores}, 
-      author={Minxing Zheng and Shixiang Zhu},
-      year={2024},
-      eprint={2410.13735},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2410.13735}, 
+```bibtex
+@inproceedings{zheng2026orca,
+  title     = {Generative Conformal Prediction with Optimized Coverage Allocation},
+  author    = {Zheng, Minxing and Zhu, Shixiang},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026}
 }
 ```
 
+Released under the [MIT License](LICENSE). The original PCP-VCR implementation is kept at the [`pcp-vcr`](https://github.com/Minxing-Zheng/ORCA/tree/pcp-vcr) tag.
