@@ -49,7 +49,7 @@ The script fits a generative model on synthetic S-shape data, then compares ORCA
 | :--- | :---: | :---: | :---: |
 | ORCA-MILP | 0.913 | 0.521 | 61.0 s |
 | ORCA-LP | 0.914 | 0.534 | 7.1 s |
-| ORCA-Greedy | 0.910 | **0.493** | 4.7 s |
+| ORCA-Greedy | 0.910 | 0.493 | 4.7 s |
 | PCP | 0.908 | 0.570 | < 0.1 s |
 
 Set size is the average length of the prediction set, so smaller is better. The MILP is exact for the exploration objective rather than for the final set size, and here it stops at its 60-second limit, so the faster LP and greedy solvers can match or beat it. For a step-by-step walkthrough, see [`notebooks/orca_toy.ipynb`](notebooks/orca_toy.ipynb).
