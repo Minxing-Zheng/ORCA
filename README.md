@@ -38,18 +38,21 @@ Prediction sets for the destination of one bike trip (red marker). ORCA and PCP 
 ```bash
 git clone https://github.com/Minxing-Zheng/ORCA.git
 cd ORCA
-pip install -e ".[notebook]"
-jupyter notebook notebooks/orca_toy.ipynb
+pip install -e .
+python scripts/run_pipeline.py --dataset s-shape --n 5000 --n-calib 2000 \
+    --n-exp 5 --solvers milp lp greedy --milp-time-limit 60
 ```
 
-The [toy notebook](notebooks/orca_toy.ipynb) runs ORCA end to end on synthetic S-shape data: it fits a generative model, ranks the generated samples, optimizes the radii, calibrates them, and compares the resulting sets with PCP at a 90% coverage target. On 1,000 test points it gives:
+The script fits a generative model on synthetic S-shape data, then compares ORCA, solved three ways, with PCP at a 90% coverage target. Each of the five runs uses 1,000 exploration and 1,000 calibration points, and results are saved to `results/`. Averages over the five runs:
 
-| Method | Coverage | Set size |
-| :--- | :---: | :---: |
-| ORCA | 0.916 | **0.430** |
-| PCP | 0.896 | 0.510 |
+| Method | Coverage | Set size | Runtime per run |
+| :--- | :---: | :---: | :---: |
+| ORCA-MILP | 0.913 | 0.521 | 61.0 s |
+| ORCA-LP | 0.914 | 0.534 | 7.1 s |
+| ORCA-Greedy | 0.910 | **0.493** | 4.7 s |
+| PCP | 0.908 | 0.570 | < 0.1 s |
 
-Set size is the average length of the prediction set, so smaller is better.
+Set size is the average length of the prediction set, so smaller is better. The MILP is exact for the exploration objective rather than for the final set size, and here it stops at its 60-second limit, so the faster LP and greedy solvers can match or beat it. For a step-by-step walkthrough, see [`notebooks/orca_toy.ipynb`](notebooks/orca_toy.ipynb).
 
 ## Citation
 

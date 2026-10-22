@@ -9,3 +9,6 @@ dist/
 .venv/
 venv/
 
+# Outputs of scripts/run_pipeline.py and scripts/make_figures.py
+results/
+figures/
