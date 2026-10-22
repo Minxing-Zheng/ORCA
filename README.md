@@ -16,7 +16,6 @@ Carnegie Mellon University
 </a>
 
 <sub>Standard CP, PCP and ORCA on the same generated samples. <a href="https://minxing-zheng.github.io/orca/">Try the interactive demo</a>.</sub>
-<br><sub>Also hosted by the Woody Zhu Group at <a href="https://woody-zhu-group.github.io/ORCA-Demo/">woody-zhu-group.github.io/ORCA-Demo</a>.</sub>
 
 </div>
 
